@@ -7,9 +7,7 @@ defmodule CLI do
   """
 
   def run(argv) do
-    argv
-      |> parse_args
-      |> process
+    argv |> parse_args |> process
   end
 
   @doc """
@@ -20,18 +18,21 @@ defmodule CLI do
   Return a tuple of `{ user, project, count }`, or `:help` if help was given.
   """
   def parse_args(argv) do
-    parse = OptionParser.parse(argv, switches: [ help: :boolean],
-                                     aliases:  [ h:    :help   ])
+    parse = OptionParser.parse(argv, switches: [ help: :boolean ], aliases: [ h: :help ])
     case  parse  do
-
-    { [ help: true ], _ }           -> :help
-    { _, [ name, section, distance, metric, time ] } -> { name, section, binary_to_integer(distance), metric, parse_time(time) }
-    _                               -> :help
+    { _, [ name, section, distance, metric, time ] } -> 
+      { name, section, binary_to_integer(distance), metric, parse_time(time) }
+    { [ help: true ], _ } -> :help
+    _ -> :help
     end
   end
 
   def parse_time(time) do
-    String.split(time, ":") |> to_int |> to_seconds |> sum
+    time |> split |> to_int |> to_seconds
+  end
+
+  def split(time) do
+    String.split(time, ":")
   end
 
   def to_int(l) do
@@ -39,14 +40,11 @@ defmodule CLI do
   end
 
   def to_seconds(l) do
-    Enum.reduce l, [], fn(x, acc) ->
-      acc = Enum.map(acc, &1 * 60)
-      [ x | acc ]
+    case l do
+    [seconds] -> seconds
+    [minutes,seconds] -> minutes*60 + seconds
+    [hours,minutes,seconds] -> hours*60*60 + minutes*60 + seconds
     end
-  end
-
-  def sum(l) do
-    Enum.reduce l, 0, &1 + &2
   end
 
   def process(:help) do
@@ -57,6 +55,6 @@ defmodule CLI do
   end
 
   def process({name, section, distance, metric, time}) do 
-    Triathlon.add(name, section, distance, time)
+    Triathlon.add(name, section, distance, metric, time)
   end
 end
