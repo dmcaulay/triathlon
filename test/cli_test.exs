@@ -11,7 +11,7 @@ defmodule CLITest do
 
   test "four values returned if three given" do
     assert parse_args(["pleasanton", "swim", "500", "meters", "1:40:15"]) == 
-      { "pleasanton", "swim", 500, "meters", 1*60*60 + 40*60 + 15 }
+      { "pleasanton", :swim, 500, :meters, 1 + 40/60 + 15/60/60 }
   end
 
 end

@@ -20,15 +20,21 @@ defmodule CLI do
   def parse_args(argv) do
     parse = OptionParser.parse(argv, switches: [ help: :boolean ], aliases: [ h: :help ])
     case  parse  do
-    { _, [ name, section, distance, metric, time ] } -> 
-      { name, section, binary_to_integer(distance), metric, parse_time(time) }
+    { _, [ race_name, section, distance, metric, time ] } -> 
+      { 
+        race_name, 
+        binary_to_atom(section), 
+        binary_to_integer(distance),
+        binary_to_atom(metric), 
+        parse_time(time) 
+      }
     { [ help: true ], _ } -> :help
     _ -> :help
     end
   end
 
   def parse_time(time) do
-    time |> split |> to_int |> to_seconds
+    time |> split |> to_int |> to_hours
   end
 
   def split(time) do
@@ -39,22 +45,22 @@ defmodule CLI do
     Enum.map(l, binary_to_integer(&1))
   end
 
-  def to_seconds(l) do
+  def to_hours(l) do
     case l do
-    [seconds] -> seconds
-    [minutes,seconds] -> minutes*60 + seconds
-    [hours,minutes,seconds] -> hours*60*60 + minutes*60 + seconds
+    [ seconds ] -> seconds/60/60
+    [ minutes, seconds ] -> minutes/60 + seconds/60/60
+    [ hours, minutes, seconds ] -> hours + minutes/60 + seconds/60/60
     end
   end
 
   def process(:help) do
     IO.puts """
-    usage: triathlon <name> <section> <distance> <metric> <time> 
+    usage: triathlon <race_name> <section> <distance> <metric> <time> 
     """
     System.halt(0)
   end
 
-  def process({name, section, distance, metric, time}) do 
-    Triathlon.add(name, section, distance, metric, time)
+  def process({race_name, section, distance, metric, time}) do 
+    IO.puts Section.add(race_name, section, distance, metric, time)
   end
 end
