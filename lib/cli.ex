@@ -25,7 +25,7 @@ defmodule CLI do
     case  parse  do
 
     { [ help: true ], _ }           -> :help
-    { _, [ name, section, distance, metric, time ] } -> { name, section, binary_to_integer(distance), metric, time }
+    { _, [ name, section, distance, metric, time ] } -> { name, section, binary_to_integer(distance), metric, parse_time(time) }
     _                               -> :help
     end
   end

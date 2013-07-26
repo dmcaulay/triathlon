@@ -11,7 +11,7 @@ defmodule CLITest do
 
   test "four values returned if three given" do
     assert parse_args(["pleasanton", "swim", "500", "meters", "0:10:15"]) == 
-      { "pleasanton", "swim", 500, "meters", "0:10:15" }
+      { "pleasanton", "swim", 500, "meters", 10*60 + 15 }
   end
 
   test "total seconds returned" do
