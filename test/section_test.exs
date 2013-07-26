@@ -7,6 +7,6 @@ defmodule SectionTest do
 
   test "adding a race" do
     assert add("pleasanton", :swim, 500, :meters, 10/60 + 23/60/60) ==
-     "your swim speed at the pleasanton triathlon is 2889.2 meters/hour"
+     "your swim speed at the pleasanton triathlon was 2889.2 meters/hour"
   end
 end
