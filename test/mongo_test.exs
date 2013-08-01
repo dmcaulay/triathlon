@@ -37,6 +37,9 @@ defmodule MongoTest do
     assert stored[:name] == "test"
     assert stored[:data] == "this is fun"
     assert is_binary(elem stored[:_id], 0)
+    record = TestObject.new stored
+    assert record.name == "test"
+    assert record.data == "this is fun"
   end
 
   # test "sorting results" do
