@@ -43,8 +43,10 @@ defmodule Riak do
     :riakc_pb_socket.delete bucket.pid, bucket.name, key
   end
 
-  def find(bucket, {field, value}) do
-    res = :riakc_pb_socket.get_index(bucket.pid, bucket.name, {:binary_index, field}, value)
+  def find(bucket, query) do find(bucket, query, []) end
+
+  def find(bucket, {field, value}, opts) do
+    res = :riakc_pb_socket.get_index_eq(bucket.pid, bucket.name, {:binary_index, field}, value, opts)
     case res do
       {:ok, {_,keys,_,_}} -> 
         Enum.map keys, get(bucket, &1)
@@ -52,10 +54,10 @@ defmodule Riak do
     end
   end
 
-  def find(bucket, {field, start, stop}) do
-    res = :riakc_pb_socket.get_index(bucket.pid, bucket.name, {:integer_index, field}, start, stop)
+  def find(bucket, {field, start, stop}, opts) do
+    res = :riakc_pb_socket.get_index_range(bucket.pid, bucket.name, {:integer_index, field}, start, stop, opts)
     case res do
-      {:ok, keys} -> 
+      {:ok, {_,keys,_,_}} -> 
         Enum.map keys, get(bucket, &1)
       _ -> res
     end
