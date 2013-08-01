@@ -36,9 +36,14 @@ defmodule Mongo do
   def find(collection, query) do
     exec collection, fn ->
       cursor = :mongo.find(collection.name, query)
-      :mongo_cursor.rest cursor
+      results = :mongo_cursor.rest cursor
+      Enum.map results, to_keyword(&1) 
     end
   end
+
+  defp to_keyword(tuple), do: tuple |> tuple_to_list |> to_keyword([])
+  defp to_keyword([], acc), do: acc
+  defp to_keyword([k, v | tail], acc), do: to_keyword(tail, [{k, v} | acc])
 
   def delete(collection, query // {}) do
     exec collection, fn ->
