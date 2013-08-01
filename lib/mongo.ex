@@ -29,30 +29,30 @@ defmodule Mongo do
 
   def insert(collection, docs) do
     exec collection, fn ->
-      docs
-        |> to_tuples
-        |> mongo_insert(collection.name)
-        |> to_keywords
+      docs 
+      |> to_tuples 
+      |> mongo_insert(collection.name) 
+      |> to_keywords
     end
   end
   defp mongo_insert(docs, name), do: :mongo.insert(name, docs)
 
   def find(collection, query // []) do
     exec collection, fn ->
-      query
-        |> to_tuple
-        |> mongo_find(collection.name)
-        |> :mongo_cursor.rest
-        |> to_keywords
+      query 
+      |> to_tuple 
+      |> mongo_find(collection.name) 
+      |> :mongo_cursor.rest 
+      |> to_keywords
     end
   end
   defp mongo_find(q, name), do: :mongo.find(name, q)
 
   def delete(collection, query // []) do
     exec collection, fn ->
-      query
-        |> to_tuple
-        |> mongo_delete(collection.name)
+      query 
+      |> to_tuple 
+      |> mongo_delete(collection.name)
     end
   end
   defp mongo_delete(q, name), do: :mongo.delete(name, q)
