@@ -43,8 +43,14 @@ defmodule RiakTest do
     assert Riak.set(bucket, "test_data_2", to_save_2) == :ok
     to_save_3 = TestObject.new name: "test", data: "this is amazing"
     assert Riak.set(bucket, "test_data_3", to_save_3) == :ok
-    assert Riak.find(bucket, {'name', "test"}) == [to_save,to_save_3]
-    assert Riak.find(bucket, {'name', "test"}, max_results: 1) == [to_save]
+    to_save_4 = TestObject.new name: "test", data: "this is new"
+    assert Riak.set(bucket, "test_data_4", to_save_4) == :ok
+    {:ok, results, _} = Riak.find(bucket, {'name', "test"})
+    assert results == [to_save,to_save_3,to_save_4] 
+    {:ok, results, _} = Riak.find(bucket, {'name', "test"}, max_results: 2)
+    assert results == [to_save,to_save_3]
+    # {:ok, results, _} = Riak.find(bucket, {'name', "test"}, continuation: continuation)
+    # assert results == [to_save_4]
   end
 
   test "adding secondary indexes on a bucket with sorting" do
@@ -58,9 +64,14 @@ defmodule RiakTest do
     assert Riak.set(bucket, "test_data_3", to_save_3) == :ok
     to_save_4 = TestObject.new name: "not_test", data: -1
     assert Riak.set(bucket, "test_data_4", to_save_4) == :ok
-    assert Riak.find(bucket, {'data', 1}) == [to_save_2]
-    assert Riak.find(bucket, {'data', -2, 10}) == [to_save_4,to_save_2,to_save,to_save_3]
-    assert Riak.find(bucket, {'data', -2, 10}, max_results: 3) == [to_save_4,to_save_2,to_save]
+    {:ok, results, _} = Riak.find(bucket, {'data', 1})
+    assert results == [to_save_2]
+    {:ok, results, _} =  Riak.find(bucket, {'data', -2, 10})
+    assert results == [to_save_4,to_save_2,to_save,to_save_3] 
+    {:ok, results, continuation} = Riak.find(bucket, {'data', -2, 10}, max_results: 3)
+    assert results == [to_save_4,to_save_2,to_save]
+    {:ok, results, _} = Riak.find(bucket, {'data', -2, 10}, continuation: continuation)
+    assert results == [to_save_3]
   end
 
 end

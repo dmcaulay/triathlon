@@ -72,8 +72,8 @@ defmodule Riak do
 
   defp get_results(res, bucket) do
     case res do
-      {:ok, {_,keys,_,_}} -> 
-        Enum.map keys, get(bucket, &1)
+      {:ok, {_,keys,_,continuation}} -> 
+        {:ok, Enum.map(keys, get(bucket, &1)), continuation}
       _ -> res
     end
   end
