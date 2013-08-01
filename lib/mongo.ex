@@ -33,8 +33,8 @@ defmodule Mongo do
       :mongo.insert(collection.name, tuples)
     end
   end
-  defp to_tuple(list) do 
-    list |> Enum.map(tuple_to_list(&1)) |> List.flatten |> list_to_tuple
+  defp to_tuple(l) do 
+    l |> Enum.map(tuple_to_list(&1)) |> List.flatten |> list_to_tuple
   end
 
   def find(collection, query // []) do
