@@ -58,19 +58,19 @@ defmodule Riak do
   def find(bucket, {field, value}, opts) do
     type = get_type value
     :riakc_pb_socket.get_index_eq(bucket.pid, bucket.name, {type, field}, value, opts)
-      |> process_results(bucket)
+      |> get_results(bucket)
   end
 
   def find(bucket, {field, start, stop}, opts) do
     type = get_type start
     :riakc_pb_socket.get_index_range(bucket.pid, bucket.name, {type, field}, start, stop, opts)
-      |> process_results(bucket)
+      |> get_results(bucket)
   end
 
   defp get_type(value) when is_binary(value), do: :binary_index
   defp get_type(value) when is_integer(value), do: :integer_index
 
-  defp process_results(res, bucket) do
+  defp get_results(res, bucket) do
     case res do
       {:ok, {_,keys,_,_}} -> 
         Enum.map keys, get(bucket, &1)
