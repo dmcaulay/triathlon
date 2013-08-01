@@ -1,5 +1,6 @@
-[ "meck": {:git,"https://github.com/eproxus/meck","161e240166a0d20e9ffa2be5d0bfa6a981f12aef",[branch: "master"]},
-  "protobuffs": {:git,"git://github.com/basho/erlang_protobuffs.git","f90e025518bdfbe48d6303c6aa5101297c56fb7b",[tag: "0.8.1"]},
-  "riak-erlang-client": {:git,"https://github.com/basho/riak-erlang-client.git","7ef867a41cb4314b79f14303b9f93ee86fd59f6e",[]},
-  "riak_pb": {:git,"git://github.com/basho/riak_pb","e0337f32a74244812678fda4ce1e08c39c780da2",[tag: "1.4.0.7"]},
-  "riakc": {:git,"https://github.com/basho/riak-erlang-client.git","7ef867a41cb4314b79f14303b9f93ee86fd59f6e",[]} ]
+[ "bson": {:git, "git://github.com/soundrop/bson-erlang", "6d3cc910eac6d4c21402427b41c411e201eca424", [{:ref, "HEAD"}]},
+  "meck": {:git, "https://github.com/eproxus/meck", "161e240166a0d20e9ffa2be5d0bfa6a981f12aef", [{:branch, "master"}]},
+  "mongodb": {:git, "https://github.com/dmcaulay/mongodb-erlang.git", "613f157c667e672225eb8dbc275b49685e03cf1e", [{:branch, "refactor"}]},
+  "protobuffs": {:git, "git://github.com/basho/erlang_protobuffs.git", "f90e025518bdfbe48d6303c6aa5101297c56fb7b", [{:tag, "0.8.1"}]},
+  "riak_pb": {:git, "git://github.com/basho/riak_pb", "26967cdefebdc6183fa0057644bed8cfc5ee36c9", [{:tag, "1.4.1.1"}]},
+  "riakc": {:git, "https://github.com/basho/riak-erlang-client.git", "e5b7f43372f26ec61410c323e483e6a9f5a42225", []} ]

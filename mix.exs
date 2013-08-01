@@ -16,7 +16,8 @@ defmodule Triathlon.Mixfile do
   # { :foobar, "0.1", git: "https://github.com/elixir-lang/foobar.git" }
   defp deps do
     [ 
-      { :'riakc', "1.4.0", git: "https://github.com/basho/riak-erlang-client.git" }
+      { :'riakc', "1.4.0", git: "https://github.com/basho/riak-erlang-client.git" },
+      { :'mongodb', "v0.3.2", git: "https://github.com/dmcaulay/mongodb-erlang.git", branch: "refactor", tag: "v0.3.2" }
     ]
   end
 end
