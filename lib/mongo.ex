@@ -67,7 +67,8 @@ defmodule Mongo do
   defp to_keyword([k, v | tail], acc), do: to_keyword(tail, [{k, v} | acc])
 
   defp to_tuples(l), do: Enum.map(l, to_tuple(&1))
-  defp to_tuple(l) do 
+  defp to_tuple(t) when is_tuple(t), do: t
+  defp to_tuple(l) when is_list(l) do 
     l |> Enum.map(tuple_to_list(&1)) |> List.flatten |> list_to_tuple
   end
 end

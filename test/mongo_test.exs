@@ -43,25 +43,19 @@ defmodule MongoTest do
     assert record == to_save
   end
 
-  # test "sorting results" do
-  #   {:ok, bucket} = Riak.create_bucket('127.0.0.1', 8087, "test")
-  #   bucket = Riak.set_indexes bucket, binary_index: "name", integer_index: "data"
-  #   to_save = TestObject.new name: "test", data: 2
-  #   assert Riak.set(bucket, "test_data", to_save) == :ok
-  #   to_save_2 = TestObject.new name: "not_test", data: 1
-  #   assert Riak.set(bucket, "test_data_2", to_save_2) == :ok
-  #   to_save_3 = TestObject.new name: "test", data: 3
-  #   assert Riak.set(bucket, "test_data_3", to_save_3) == :ok
-  #   to_save_4 = TestObject.new name: "not_test", data: -1
-  #   assert Riak.set(bucket, "test_data_4", to_save_4) == :ok
-  #   {:ok, results, _} = Riak.find(bucket, {'data', 1})
-  #   assert results == [to_save_2]
-  #   {:ok, results, _} =  Riak.find(bucket, {'data', -2, 10})
-  #   assert results == [to_save_4,to_save_2,to_save,to_save_3] 
-  #   {:ok, results, continuation} = Riak.find(bucket, {'data', -2, 10}, max_results: 3)
-  #   assert results == [to_save_4,to_save_2,to_save]
-  #   {:ok, results, _} = Riak.find(bucket, {'data', -2, 10}, continuation: continuation)
-  #   assert results == [to_save_3]
-  # end
+  test "sorting results" do
+    {:ok, collection} = Mongo.get_collection('127.0.0.1', 27017, :test, :docs)
+    assert Mongo.delete(collection) == :ok
+    to_save = TestObject.new name: "test", data: 2
+    Mongo.insert(collection, [to_save.to_keywords])
+    to_save_2 = TestObject.new name: "not_test", data: 1
+    Mongo.insert(collection, [to_save_2.to_keywords])
+    to_save_3 = TestObject.new name: "test", data: 3
+    Mongo.insert(collection, [to_save_3.to_keywords])
+    to_save_4 = TestObject.new name: "not_test", data: -1
+    Mongo.insert(collection, [to_save_4.to_keywords])
+    results = Mongo.find(collection, {:'$query', {}, :'$orderby', {:data, 1}})
+    assert Enum.map(results, TestObject.new &1) == [to_save_4,to_save_2,to_save,to_save_3] 
+  end
 
 end
