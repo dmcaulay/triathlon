@@ -15,18 +15,28 @@ defmodule Riak do
     end
   end
 
-  def create_bucket(pid, name) do
+  def create_bucket(pid, name) do 
     {:ok, Bucket.new pid: pid, name: name}
   end
 
-  def set_indexes(bucket, indexes) do
-    bucket.indexes indexes
-  end
+  def set_indexes(bucket, indexes), do: bucket.indexes(indexes)
 
   def set(bucket, key, obj) do
     riak_obj = :riakc_obj.new bucket.name, key, obj
     riak_obj = add_indexes bucket, obj, riak_obj
     :riakc_pb_socket.put bucket.pid, riak_obj
+  end
+
+  defp add_indexes(Bucket[indexes: nil], _, riak_obj), do: riak_obj
+
+  defp add_indexes(bucket, obj, riak_obj) do
+    meta = :riakc_obj.get_update_metadata riak_obj
+    to_index = Enum.map bucket.indexes, fn(i = {_, field}) ->
+      {val, _} = Code.eval_string "obj.#{field}", [obj: obj]
+      {i, [val]}
+    end
+    indexed = :riakc_obj.set_secondary_index meta, to_index
+    :riakc_obj.update_metadata riak_obj, indexed
   end
 
   def get(bucket, key, decode // true) do
@@ -43,36 +53,29 @@ defmodule Riak do
     :riakc_pb_socket.delete bucket.pid, bucket.name, key
   end
 
-  def find(bucket, query) do find(bucket, query, []) end
+  def find(bucket, query), do: find(bucket, query, [])
 
   def find(bucket, {field, value}, opts) do
-    res = :riakc_pb_socket.get_index_eq(bucket.pid, bucket.name, {:binary_index, field}, value, opts)
-    case res do
-      {:ok, {_,keys,_,_}} -> 
-        Enum.map keys, get(bucket, &1)
-      _ -> res
-    end
+    type = get_type value
+    :riakc_pb_socket.get_index_eq(bucket.pid, bucket.name, {type, field}, value, opts)
+      |> process_results(bucket)
   end
 
   def find(bucket, {field, start, stop}, opts) do
-    res = :riakc_pb_socket.get_index_range(bucket.pid, bucket.name, {:integer_index, field}, start, stop, opts)
+    type = get_type start
+    :riakc_pb_socket.get_index_range(bucket.pid, bucket.name, {type, field}, start, stop, opts)
+      |> process_results(bucket)
+  end
+
+  defp get_type(value) when is_binary(value), do: :binary_index
+  defp get_type(value) when is_integer(value), do: :integer_index
+
+  defp process_results(res, bucket) do
     case res do
       {:ok, {_,keys,_,_}} -> 
         Enum.map keys, get(bucket, &1)
       _ -> res
     end
-  end
-
-  defp add_indexes(Bucket[indexes: nil], _, riak_obj), do: riak_obj
-
-  defp add_indexes(bucket, obj, riak_obj) do
-    meta = :riakc_obj.get_update_metadata riak_obj
-    to_index = Enum.map bucket.indexes, fn(i = {type, field}) ->
-      {val, _} = Code.eval_string "obj.#{field}", [obj: obj]
-      {i, [val]}
-    end
-    indexed = :riakc_obj.set_secondary_index meta, to_index
-    :riakc_obj.update_metadata riak_obj, indexed
   end
 
 end
