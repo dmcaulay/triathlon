@@ -29,13 +29,17 @@ defmodule Mongo do
 
   def insert(collection, docs) do
     exec collection, fn ->
-      :mongo.insert(collection.name, docs)
+      tuples = Enum.map docs, to_tuple(&1)
+      :mongo.insert(collection.name, tuples)
     end
   end
+  defp to_tuple(list) do 
+    list |> Enum.map(tuple_to_list(&1)) |> List.flatten |> list_to_tuple
+  end
 
-  def find(collection, query) do
+  def find(collection, query // []) do
     exec collection, fn ->
-      cursor = :mongo.find(collection.name, query)
+      cursor = :mongo.find(collection.name, to_tuple(query))
       results = :mongo_cursor.rest cursor
       Enum.map results, to_keyword(&1) 
     end
@@ -45,9 +49,9 @@ defmodule Mongo do
   defp to_keyword([], acc), do: acc
   defp to_keyword([k, v | tail], acc), do: to_keyword(tail, [{k, v} | acc])
 
-  def delete(collection, query // {}) do
+  def delete(collection, query // []) do
     exec collection, fn ->
-      :mongo.delete(collection.name, query)
+      :mongo.delete collection.name, to_tuple(query)
     end
   end
 
