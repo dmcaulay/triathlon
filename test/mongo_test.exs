@@ -32,7 +32,9 @@ defmodule MongoTest do
     {:ok, collection} = Mongo.get_collection('127.0.0.1', 27017, :test, :docs)
     assert Mongo.delete(collection) == :ok
     to_save = TestObject.new name: "test", data: "this is fun"
-    assert Mongo.insert(collection, [to_save.to_keywords])
+    [stored] = Mongo.insert(collection, [to_save.to_keywords])
+    record = TestObject.new stored
+    assert record == to_save
     [stored] = Mongo.find(collection, [name: "test"])
     assert stored[:name] == "test"
     assert stored[:data] == "this is fun"
