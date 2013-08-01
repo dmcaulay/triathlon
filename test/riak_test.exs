@@ -43,7 +43,7 @@ defmodule RiakTest do
     assert Riak.set(bucket, "test_data_2", to_save_2) == :ok
     to_save_3 = TestObject.new name: "test", data: "this is amazing"
     assert Riak.set(bucket, "test_data_3", to_save_3) == :ok
-    assert Riak.find(bucket, {'name', "test"}) == [to_save_3,to_save]
+    assert Riak.find(bucket, {'name', "test"}) == [to_save,to_save_3]
   end
 
 end
