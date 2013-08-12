@@ -31,12 +31,19 @@ defmodule Riak do
 
   defp add_indexes(bucket, obj, riak_obj) do
     meta = :riakc_obj.get_update_metadata riak_obj
-    to_index = Enum.map bucket.indexes, fn(i = {_, field}) ->
-      {val, _} = Code.eval_string "obj.#{field}", [obj: obj]
-      {i, [val]}
-    end
+    to_index = Enum.map bucket.indexes, eval_index(obj, &1)
     indexed = :riakc_obj.set_secondary_index meta, to_index
     :riakc_obj.update_metadata riak_obj, indexed
+  end
+
+  defp eval_index(obj, index = {_, field}) do
+    {val, _} = Code.eval_string "obj.#{field}", [obj: obj]
+    {index, [val]}
+  end
+
+  defp eval_index(obj, {type, field, fun}) do
+    val = fun.(obj)
+    {{type, field}, [val]}
   end
 
   def get(bucket, key, decode // true) do
